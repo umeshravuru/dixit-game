@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top, #3d2a5e 0%, #1a0f2e 60%, #0a0617 100%);
+  color: #f5efe0;
+  font-family: Georgia, 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+button:not(:disabled):active { transform: translateY(1px); }
+
+.card-shadow {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.glow-gold {
+  box-shadow: 0 0 0 3px #c9a455, 0 0 24px rgba(201,164,85,0.5);
+}
+
+.glow-plum {
+  box-shadow: 0 0 0 3px #b08fd1, 0 0 16px rgba(176,143,209,0.4);
+}
+
+/* Card flip + hover */
+.card-tile {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-tile:hover:not(.disabled) { transform: translateY(-6px); }
+.card-tile.disabled { opacity: 0.5; cursor: not-allowed; }
