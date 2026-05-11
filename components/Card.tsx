@@ -15,10 +15,11 @@ interface Props {
 
 export function Card({ cardId, selected, highlighted, outcome, disabled, onClick, label, size = 'md' }: Props) {
   const card = CARDS[cardId];
+  // Responsive sizes — bigger on mobile (where cards stack), smaller on desktop (where they fan out).
   const sizes = {
-    sm: 'w-24 h-32',
-    md: 'w-36 h-48',
-    lg: 'w-48 h-64',
+    sm: 'w-32 h-44 sm:w-28 sm:h-40 md:w-24 md:h-32',
+    md: 'w-64 h-80 sm:w-44 sm:h-60 md:w-40 md:h-56 lg:w-44 lg:h-60',
+    lg: 'w-72 h-96 sm:w-56 sm:h-72 md:w-48 md:h-64 lg:w-56 lg:h-72',
   };
 
   const glow =
@@ -61,9 +62,9 @@ export function Card({ cardId, selected, highlighted, outcome, disabled, onClick
 
 export function CardBack({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   const sizes = {
-    sm: 'w-24 h-32',
-    md: 'w-36 h-48',
-    lg: 'w-48 h-64',
+    sm: 'w-32 h-44 sm:w-28 sm:h-40 md:w-24 md:h-32',
+    md: 'w-64 h-80 sm:w-44 sm:h-60 md:w-40 md:h-56 lg:w-44 lg:h-60',
+    lg: 'w-72 h-96 sm:w-56 sm:h-72 md:w-48 md:h-64 lg:w-56 lg:h-72',
   };
   return (
     <div className={`${sizes[size]} rounded-xl card-shadow flex items-center justify-center`}

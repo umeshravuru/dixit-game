@@ -140,7 +140,7 @@ export default function RoomPage() {
   // ============ PHASE: LOBBY ============
   if (state.phase === 'lobby') {
     return (
-      <main className="min-h-screen p-6 max-w-4xl mx-auto">
+      <main className="min-h-screen p-3 md:p-6 max-w-4xl mx-auto">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
         <div className="grid md:grid-cols-3 gap-6 mt-6">
           <div className="md:col-span-2 space-y-6">
@@ -173,7 +173,7 @@ export default function RoomPage() {
   // ============ PHASE: CLUE (storyteller picks card + clue) ============
   if (state.phase === 'clue') {
     return (
-      <main className="min-h-screen p-6 max-w-6xl mx-auto">
+      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
         <div className="grid md:grid-cols-4 gap-6 mt-6">
           <div className="md:col-span-3 space-y-4">
@@ -216,7 +216,7 @@ export default function RoomPage() {
   // ============ PHASE: SUBMIT (others pick decoy) ============
   if (state.phase === 'submit') {
     return (
-      <main className="min-h-screen p-6 max-w-6xl mx-auto">
+      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
         <div className="bg-plum/20 border-2 border-plum/50 rounded-xl p-5 mt-6 text-center">
           <p className="text-cream/60 text-xs uppercase tracking-wider mb-1">The clue is</p>
@@ -268,7 +268,7 @@ export default function RoomPage() {
   // ============ PHASE: VOTE ============
   if (state.phase === 'vote') {
     return (
-      <main className="min-h-screen p-6 max-w-6xl mx-auto">
+      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
         <div className="bg-plum/20 border-2 border-plum/50 rounded-xl p-5 mt-6 text-center">
           <p className="text-cream/60 text-xs uppercase tracking-wider mb-1">The clue is</p>
@@ -298,7 +298,7 @@ export default function RoomPage() {
                 </button>
               </>
             )}
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="flex flex-wrap gap-4 md:gap-3 justify-center">
               {state.shuffledCards.map((cardId) => {
                 const myOwnCard = state.submissions.find(
                   (s) => s.playerId === playerId
@@ -336,7 +336,7 @@ export default function RoomPage() {
   if (state.phase === 'reveal' || state.phase === 'ended') {
     const result = state.lastResult;
     return (
-      <main className="min-h-screen p-6 max-w-6xl mx-auto">
+      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
         {state.phase === 'ended' ? (
           <EndScreen state={state} />
@@ -352,7 +352,7 @@ export default function RoomPage() {
               <span className="text-green-400 font-bold">Green</span> = storyteller's card ·{' '}
               <span className="text-red-400 font-bold">Red</span> = decoy that got votes
             </p>
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="flex flex-wrap gap-6 md:gap-4 justify-center">
               {state.shuffledCards.map((cardId) => {
                 const isStoryCard = cardId === revealedStorytellerCard;
                 const owner =
@@ -367,7 +367,7 @@ export default function RoomPage() {
                 const outcome: 'correct' | 'decoy' | undefined =
                   isStoryCard ? 'correct' : voteCount > 0 ? 'decoy' : undefined;
                 return (
-                  <div key={cardId} className="flex flex-col items-center gap-2 w-40">
+                  <div key={cardId} className="flex flex-col items-center gap-2 w-64 sm:w-44 md:w-40">
                     <Card
                       cardId={cardId}
                       outcome={outcome}
