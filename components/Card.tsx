@@ -6,13 +6,14 @@ interface Props {
   cardId: number;
   selected?: boolean;
   highlighted?: boolean; // gold glow (e.g. storyteller's card on reveal)
+  outcome?: 'correct' | 'decoy'; // reveal-phase emphasis: green = storyteller's, red = decoy
   disabled?: boolean;
   onClick?: () => void;
   label?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function Card({ cardId, selected, highlighted, disabled, onClick, label, size = 'md' }: Props) {
+export function Card({ cardId, selected, highlighted, outcome, disabled, onClick, label, size = 'md' }: Props) {
   const card = CARDS[cardId];
   const sizes = {
     sm: 'w-24 h-32',
@@ -20,13 +21,18 @@ export function Card({ cardId, selected, highlighted, disabled, onClick, label, 
     lg: 'w-48 h-64',
   };
 
+  const glow =
+    outcome === 'correct' ? 'glow-green'
+    : outcome === 'decoy' ? 'glow-red'
+    : selected ? 'glow-plum'
+    : highlighted ? 'glow-gold'
+    : '';
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`card-tile relative rounded-xl overflow-hidden card-shadow ${sizes[size]} ${
-        selected ? 'glow-plum' : highlighted ? 'glow-gold' : ''
-      } ${disabled ? 'disabled' : ''}`}
+      className={`card-tile relative rounded-xl overflow-hidden card-shadow ${sizes[size]} ${glow} ${disabled ? 'disabled' : ''}`}
       style={{ background: '#1a0f2e' }}
     >
       {card ? (

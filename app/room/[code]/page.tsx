@@ -347,7 +347,11 @@ export default function RoomPage() {
               <p className="text-3xl text-gold font-serif italic">"{state.clue}"</p>
               <p className="text-cream/60 text-sm mt-2">— {storyteller.name}</p>
             </div>
-            <h2 className="text-2xl text-gold font-serif text-center mt-6 mb-4">Reveal</h2>
+            <h2 className="text-2xl text-gold font-serif text-center mt-6 mb-2">Reveal</h2>
+            <p className="text-center text-cream/60 text-sm mb-4">
+              <span className="text-green-400 font-bold">Green</span> = storyteller's card ·{' '}
+              <span className="text-red-400 font-bold">Red</span> = decoy that got votes
+            </p>
             <div className="flex flex-wrap gap-4 justify-center">
               {state.shuffledCards.map((cardId) => {
                 const isStoryCard = cardId === revealedStorytellerCard;
@@ -355,18 +359,39 @@ export default function RoomPage() {
                   result?.submissions.find((s) => s.cardId === cardId) ||
                   (isStoryCard ? { playerId: storyteller.id } : null);
                 const ownerName = owner ? state.players.find((p) => p.id === owner.playerId)?.name : '';
-                const voteCount = result?.votes.filter((v) => v.cardId === cardId).length ?? 0;
+                const voters =
+                  result?.votes.filter((v) => v.cardId === cardId)
+                    .map((v) => state.players.find((p) => p.id === v.voterId)?.name)
+                    .filter(Boolean) ?? [];
+                const voteCount = voters.length;
+                const outcome: 'correct' | 'decoy' | undefined =
+                  isStoryCard ? 'correct' : voteCount > 0 ? 'decoy' : undefined;
                 return (
-                  <div key={cardId} className="flex flex-col items-center gap-2">
+                  <div key={cardId} className="flex flex-col items-center gap-2 w-40">
                     <Card
                       cardId={cardId}
-                      highlighted={isStoryCard}
+                      outcome={outcome}
                       size="md"
                       label={isStoryCard ? `🎭 ${ownerName}` : ownerName}
                     />
+                    {isStoryCard && (
+                      <div className="text-green-400 font-bold text-xs uppercase tracking-wider">
+                        ✅ Storyteller's card
+                      </div>
+                    )}
+                    {!isStoryCard && voteCount > 0 && (
+                      <div className="text-red-400 font-bold text-xs uppercase tracking-wider">
+                        ❌ Decoy
+                      </div>
+                    )}
                     <div className="text-cream/80 text-sm">
                       {voteCount} vote{voteCount === 1 ? '' : 's'}
                     </div>
+                    {voters.length > 0 && (
+                      <div className="text-cream/50 text-xs text-center leading-tight">
+                        voted by: {voters.join(', ')}
+                      </div>
+                    )}
                   </div>
                 );
               })}
