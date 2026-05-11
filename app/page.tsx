@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <h1 className="text-center text-5xl font-serif text-gold mb-2 tracking-wide">Dreamscape</h1>
+        <h1 className="text-center text-5xl font-serif text-gold mb-2 tracking-wide">Dixit</h1>
         <p className="text-center text-cream/70 italic mb-10">a storytelling card game</p>
 
         <div className="bg-ink/60 backdrop-blur rounded-2xl p-8 card-shadow border border-plum/30">

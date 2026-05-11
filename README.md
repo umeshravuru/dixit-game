@@ -1,4 +1,4 @@
-# Dreamscape
+# Dixit
 
 A Dixit-style storytelling card game. 3–8 players, ~10 minutes per game.
 

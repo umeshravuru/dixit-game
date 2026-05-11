@@ -415,7 +415,7 @@ function Header({ code, phase, round, maxRounds }: { code: string; phase: Phase;
   return (
     <div className="flex items-center justify-between">
       <div>
-        <h1 className="text-3xl font-serif text-gold">Dreamscape</h1>
+        <h1 className="text-3xl font-serif text-gold">Dixit</h1>
         <p className="text-cream/50 text-xs uppercase tracking-wider mt-1">
           Room {code} · {phase === 'lobby' ? 'Lobby' : `Round ${round}/${maxRounds}`}
         </p>

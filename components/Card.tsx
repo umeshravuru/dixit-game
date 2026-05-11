@@ -36,6 +36,10 @@ export function Card({ cardId, selected, highlighted, disabled, onClick, label, 
           alt={card.title}
           className="w-full h-full object-cover"
           loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget;
+            if (img.src !== card.localUrl) img.src = card.localUrl;
+          }}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center text-cream/40">?</div>
