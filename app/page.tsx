@@ -58,27 +58,41 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <h1 className="text-center text-5xl font-serif text-gold mb-2 tracking-wide">Dixit</h1>
-        <p className="text-center text-cream/70 italic mb-10">a storytelling card game</p>
+        <div className="mb-10 text-center animate-fade-up">
+          <p className="eyebrow mb-4 text-coral">A storytelling card game</p>
+          <h1 className="font-display text-7xl font-medium leading-none tracking-tight text-ink">
+            Dixit
+          </h1>
+          <p className="mt-4 font-display text-lg italic text-muted">
+            Pick a card. Give a clue. Trick some, but not all.
+          </p>
+        </div>
 
-        <div className="bg-ink/60 backdrop-blur rounded-2xl p-8 card-shadow border border-plum/30">
+        <div
+          className="rounded-2xl border border-line bg-card p-7 shadow-frame animate-fade-up"
+          style={{ animationDelay: '80ms' }}
+        >
           {mode === 'menu' && (
             <div className="space-y-3">
               <button
                 onClick={() => setMode('create')}
-                className="w-full py-4 rounded-xl bg-gold text-ink font-bold text-lg hover:bg-gold/90 transition"
+                className="w-full rounded-xl bg-ink py-4 text-base font-semibold text-paper transition-colors hover:bg-ink/90"
               >
-                Create Room
+                Create a room
               </button>
               <button
                 onClick={() => setMode('join')}
-                className="w-full py-4 rounded-xl border-2 border-plum text-cream font-bold text-lg hover:bg-plum/30 transition"
+                className="w-full rounded-xl border border-line bg-paper py-4 text-base font-semibold text-ink transition-colors hover:border-ink/30 hover:bg-line/40"
               >
-                Join Room
+                Join a room
               </button>
-              <p className="text-center text-cream/50 text-sm pt-4">3–8 players · 10 minutes</p>
+              <div className="flex items-center justify-center gap-3 pt-3 text-sm text-muted">
+                <span>3–8 players</span>
+                <span className="h-1 w-1 rounded-full bg-line" />
+                <span>~10 minutes</span>
+              </div>
             </div>
           )}
 
@@ -86,41 +100,47 @@ export default function Home() {
             <div className="space-y-4">
               <button
                 onClick={() => { setMode('menu'); setError(''); }}
-                className="text-cream/60 hover:text-cream text-sm"
+                className="text-sm font-medium text-muted transition-colors hover:text-ink"
               >
                 ← back
               </button>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-                maxLength={20}
-                className="w-full px-4 py-3 rounded-lg bg-ink/80 border border-plum/40 text-cream placeholder-cream/40 focus:outline-none focus:border-gold"
-              />
-              {mode === 'join' && (
+              <div className="space-y-1.5">
+                <label className="eyebrow block text-muted">Your name</label>
                 <input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="ROOM CODE"
-                  maxLength={5}
-                  className="w-full px-4 py-3 rounded-lg bg-ink/80 border border-plum/40 text-cream placeholder-cream/40 focus:outline-none focus:border-gold tracking-widest text-center text-xl"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g. Ada"
+                  maxLength={20}
+                  className="w-full rounded-xl border border-line bg-paper px-4 py-3 text-ink placeholder-muted/50 transition-colors focus:border-coral focus:ring-2 focus:ring-coral/20"
                 />
+              </div>
+              {mode === 'join' && (
+                <div className="space-y-1.5">
+                  <label className="eyebrow block text-muted">Room code</label>
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    placeholder="ABCDE"
+                    maxLength={5}
+                    className="w-full rounded-xl border border-line bg-paper px-4 py-3 text-center font-display text-2xl tracking-[0.4em] text-ink placeholder-muted/40 transition-colors focus:border-coral focus:ring-2 focus:ring-coral/20"
+                  />
+                </div>
               )}
-              {error && <p className="text-red-300 text-sm">{error}</p>}
+              {error && (
+                <p className="rounded-lg bg-coral/10 px-3 py-2 text-sm font-medium text-coralink">
+                  {error}
+                </p>
+              )}
               <button
                 onClick={mode === 'create' ? createRoom : joinRoom}
                 disabled={loading}
-                className="w-full py-4 rounded-xl bg-gold text-ink font-bold text-lg hover:bg-gold/90 transition disabled:opacity-50"
+                className="w-full rounded-xl bg-coral py-4 text-base font-semibold text-paper transition-colors hover:bg-coralink disabled:opacity-50"
               >
-                {loading ? '...' : mode === 'create' ? 'Create' : 'Join'}
+                {loading ? 'One moment…' : mode === 'create' ? 'Create room' : 'Join room'}
               </button>
             </div>
           )}
         </div>
-
-        <p className="text-center text-cream/40 text-xs mt-8">
-          Pick a card. Give a clue. Trick some, but not all.
-        </p>
       </div>
     </main>
   );

@@ -117,15 +117,24 @@ export default function RoomPage() {
   }
 
   if (!state || !playerId) {
-    return <main className="min-h-screen flex items-center justify-center text-cream">Loading…</main>;
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <p className="font-display text-lg italic text-muted animate-pulse-soft">Loading…</p>
+      </main>
+    );
   }
 
   const me = state.players.find((p) => p.id === playerId);
   if (!me) {
     return (
-      <main className="min-h-screen flex items-center justify-center text-cream flex-col gap-4">
-        <p>You're not in this room.</p>
-        <button onClick={() => router.push('/')} className="px-4 py-2 bg-gold text-ink rounded">Home</button>
+      <main className="flex min-h-screen flex-col items-center justify-center gap-5 p-6 text-center">
+        <p className="font-display text-2xl italic text-ink">You're not in this room.</p>
+        <button
+          onClick={() => router.push('/')}
+          className="rounded-xl bg-ink px-6 py-3 font-semibold text-paper transition-colors hover:bg-ink/90"
+        >
+          Back home
+        </button>
       </main>
     );
   }
@@ -140,32 +149,47 @@ export default function RoomPage() {
   // ============ PHASE: LOBBY ============
   if (state.phase === 'lobby') {
     return (
-      <main className="min-h-screen p-3 md:p-6 max-w-4xl mx-auto">
+      <main className="mx-auto max-w-4xl p-4 md:p-8">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
-        <div className="grid md:grid-cols-3 gap-6 mt-6">
-          <div className="md:col-span-2 space-y-6">
-            <div className="bg-ink/60 backdrop-blur rounded-2xl p-8 border border-plum/30">
-              <h2 className="text-2xl text-gold font-serif mb-2">Waiting for players…</h2>
-              <p className="text-cream/70 mb-6">Share the code with friends:</p>
-              <div className="bg-ink/80 rounded-xl p-6 text-center mb-6">
-                <div className="text-cream/50 text-sm uppercase tracking-wider mb-2">Room Code</div>
-                <div className="text-5xl font-bold text-gold tracking-widest">{code}</div>
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="space-y-6 md:col-span-2">
+            <div className="rounded-2xl border border-line bg-card p-8 shadow-frame animate-fade-up">
+              <h2 className="font-display text-3xl font-medium text-ink">The room is open</h2>
+              <p className="mt-2 text-muted">Share this code with your friends to let them in.</p>
+
+              <div className="ticket my-7 rounded-2xl border border-line px-6 py-7 text-center">
+                <div className="eyebrow mb-3 text-muted">Room code</div>
+                <div className="font-display text-6xl font-semibold tracking-[0.25em] text-ink">
+                  {code}
+                </div>
+                <button
+                  onClick={() => navigator.clipboard?.writeText(code)}
+                  className="mt-4 text-sm font-medium text-coral transition-colors hover:text-coralink"
+                >
+                  Copy code
+                </button>
               </div>
-              {me.isHost && (
+
+              {me.isHost ? (
                 <button
                   onClick={() => apiCall('/api/game/start', { code, playerId, maxRounds: state.players.length * 2 })}
                   disabled={state.players.length < 3 || busy}
-                  className="w-full py-4 rounded-xl bg-gold text-ink font-bold text-lg disabled:opacity-50 hover:bg-gold/90"
+                  className="w-full rounded-xl bg-coral py-4 text-base font-semibold text-paper transition-colors hover:bg-coralink disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {state.players.length < 3 ? `Need ${3 - state.players.length} more player(s)` : 'Start Game'}
+                  {state.players.length < 3
+                    ? `Need ${3 - state.players.length} more player${3 - state.players.length === 1 ? '' : 's'}`
+                    : 'Start game'}
                 </button>
+              ) : (
+                <p className="text-center font-display italic text-muted">
+                  Waiting for the host to start…
+                </p>
               )}
-              {!me.isHost && <p className="text-cream/60 text-center italic">Waiting for host to start…</p>}
             </div>
           </div>
           <PlayerList players={state.players} storytellerId={null} meId={playerId} />
         </div>
-        {error && <p className="text-red-300 text-center mt-4">{error}</p>}
+        {error && <ErrorNote>{error}</ErrorNote>}
       </main>
     );
   }
@@ -173,42 +197,50 @@ export default function RoomPage() {
   // ============ PHASE: CLUE (storyteller picks card + clue) ============
   if (state.phase === 'clue') {
     return (
-      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
+      <main className="mx-auto max-w-6xl p-4 md:p-8">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
-        <div className="grid md:grid-cols-4 gap-6 mt-6">
-          <div className="md:col-span-3 space-y-4">
+        <div className="mt-8 grid gap-6 md:grid-cols-4">
+          <div className="space-y-5 md:col-span-3">
             {isStoryteller ? (
               <>
-                <div className="bg-gold/15 border-2 border-gold/50 rounded-xl p-5">
-                  <p className="text-gold font-bold mb-1">🎭 You are the storyteller</p>
-                  <p className="text-cream/80 text-sm">Pick a card from your hand, then give a clue. Be clever — you score most when <em>some but not all</em> players guess your card.</p>
+                <div className="rounded-2xl border border-gold/40 bg-gold/10 p-6 animate-fade-up">
+                  <p className="eyebrow mb-2 text-gold">🎭 You are the storyteller</p>
+                  <p className="text-ink/80">
+                    Choose a card, then give a clue. Score the most when{' '}
+                    <em className="font-display not-italic font-semibold">some — but not all</em> —
+                    guess your card.
+                  </p>
                 </div>
-                <input
-                  value={clue}
-                  onChange={(e) => setClue(e.target.value)}
-                  placeholder="Your clue (a word, phrase, sound...)"
-                  maxLength={100}
-                  className="w-full px-4 py-3 rounded-lg bg-ink/80 border border-plum/40 text-cream placeholder-cream/40 focus:outline-none focus:border-gold"
-                />
-                <button
-                  onClick={() => apiCall('/api/game/clue', { code, playerId, cardId: selectedCard, clue })}
-                  disabled={selectedCard === null || !clue.trim() || busy}
-                  className="w-full py-3 rounded-xl bg-gold text-ink font-bold disabled:opacity-50"
-                >
-                  Submit clue & card
-                </button>
+                <div className="rounded-2xl border border-line bg-card p-5 shadow-frame">
+                  <label className="eyebrow mb-2 block text-muted">Your clue</label>
+                  <input
+                    value={clue}
+                    onChange={(e) => setClue(e.target.value)}
+                    placeholder="A word, a phrase, a sound…"
+                    maxLength={100}
+                    className="w-full rounded-xl border border-line bg-paper px-4 py-3 font-display text-lg italic text-ink placeholder-muted/50 transition-colors focus:border-coral focus:ring-2 focus:ring-coral/20"
+                  />
+                  <button
+                    onClick={() => apiCall('/api/game/clue', { code, playerId, cardId: selectedCard, clue })}
+                    disabled={selectedCard === null || !clue.trim() || busy}
+                    className="mt-3 w-full rounded-xl bg-coral py-3 font-semibold text-paper transition-colors hover:bg-coralink disabled:opacity-40"
+                  >
+                    {selectedCard === null ? 'Select a card below' : 'Submit clue & card'}
+                  </button>
+                </div>
                 <Hand hand={hand} selectedCard={selectedCard} onSelect={setSelectedCard} />
               </>
             ) : (
-              <div className="bg-ink/60 rounded-2xl p-8 text-center">
-                <p className="text-2xl text-gold mb-2">🎭 {storyteller.name}</p>
-                <p className="text-cream/70 italic">is dreaming up a clue…</p>
-              </div>
+              <WaitingCard
+                title={storyteller.name}
+                subtitle="is dreaming up a clue…"
+                emoji="🎭"
+              />
             )}
           </div>
           <PlayerList players={state.players} storytellerId={storyteller.id} meId={playerId} />
         </div>
-        {error && <p className="text-red-300 text-center mt-4">{error}</p>}
+        {error && <ErrorNote>{error}</ErrorNote>}
       </main>
     );
   }
@@ -216,39 +248,38 @@ export default function RoomPage() {
   // ============ PHASE: SUBMIT (others pick decoy) ============
   if (state.phase === 'submit') {
     return (
-      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
+      <main className="mx-auto max-w-6xl p-4 md:p-8">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
-        <div className="bg-plum/20 border-2 border-plum/50 rounded-xl p-5 mt-6 text-center">
-          <p className="text-cream/60 text-xs uppercase tracking-wider mb-1">The clue is</p>
-          <p className="text-3xl text-gold font-serif italic">"{state.clue}"</p>
-          <p className="text-cream/60 text-sm mt-2">— {storyteller.name}</p>
-        </div>
-        <div className="grid md:grid-cols-4 gap-6 mt-6">
+        <ClueBanner clue={state.clue} author={storyteller.name} />
+        <div className="mt-6 grid gap-6 md:grid-cols-4">
           <div className="md:col-span-3">
             {isStoryteller ? (
-              <div className="bg-ink/60 rounded-2xl p-8 text-center">
-                <p className="text-cream/70">Others are picking their cards…</p>
-                <p className="text-cream/50 text-sm mt-2">
-                  {state.submissions.length} / {state.players.length - 1} submitted
-                </p>
-              </div>
+              <WaitingCard
+                title="Your storytellers are choosing"
+                subtitle={`${state.submissions.length} of ${state.players.length - 1} have picked a decoy`}
+              />
             ) : iSubmitted ? (
-              <div className="bg-ink/60 rounded-2xl p-8 text-center">
-                <p className="text-cream/70">Card submitted ✓</p>
-                <p className="text-cream/50 text-sm mt-2">
-                  Waiting for {state.players.length - 1 - state.submissions.length} more…
-                </p>
-              </div>
+              <WaitingCard
+                title="Card locked in"
+                subtitle={`Waiting for ${state.players.length - 1 - state.submissions.length} more…`}
+                done
+              />
             ) : (
               <>
-                <p className="text-cream/80 mb-3">Pick a card that matches the clue — try to fool the others.</p>
-                <button
-                  onClick={() => apiCall('/api/game/submit', { code, playerId, cardId: selectedCard })}
-                  disabled={selectedCard === null || busy}
-                  className="w-full py-3 rounded-xl bg-gold text-ink font-bold disabled:opacity-50 mb-4"
-                >
-                  Submit card
-                </button>
+                <div className="mb-4 rounded-2xl border border-line bg-card p-5 shadow-frame">
+                  <p className="text-ink/80">
+                    Pick a card that fits the clue — you want others to mistake{' '}
+                    <em className="font-display not-italic font-semibold">yours</em> for the
+                    storyteller's.
+                  </p>
+                  <button
+                    onClick={() => apiCall('/api/game/submit', { code, playerId, cardId: selectedCard })}
+                    disabled={selectedCard === null || busy}
+                    className="mt-3 w-full rounded-xl bg-coral py-3 font-semibold text-paper transition-colors hover:bg-coralink disabled:opacity-40"
+                  >
+                    {selectedCard === null ? 'Select a card below' : 'Submit card'}
+                  </button>
+                </div>
                 <Hand hand={hand} selectedCard={selectedCard} onSelect={setSelectedCard} />
               </>
             )}
@@ -260,7 +291,7 @@ export default function RoomPage() {
             submittedIds={submittedIds}
           />
         </div>
-        {error && <p className="text-red-300 text-center mt-4">{error}</p>}
+        {error && <ErrorNote>{error}</ErrorNote>}
       </main>
     );
   }
@@ -268,37 +299,38 @@ export default function RoomPage() {
   // ============ PHASE: VOTE ============
   if (state.phase === 'vote') {
     return (
-      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
+      <main className="mx-auto max-w-6xl p-4 md:p-8">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
-        <div className="bg-plum/20 border-2 border-plum/50 rounded-xl p-5 mt-6 text-center">
-          <p className="text-cream/60 text-xs uppercase tracking-wider mb-1">The clue is</p>
-          <p className="text-3xl text-gold font-serif italic">"{state.clue}"</p>
-        </div>
-        <div className="grid md:grid-cols-4 gap-6 mt-6">
+        <ClueBanner clue={state.clue} author={storyteller.name} />
+        <div className="mt-6 grid gap-6 md:grid-cols-4">
           <div className="md:col-span-3">
             {isStoryteller ? (
-              <div className="bg-ink/60 rounded-2xl p-6 text-center mb-4">
-                <p className="text-cream/70">Others are voting…</p>
-                <p className="text-cream/50 text-sm mt-2">{state.votes.length} / {state.players.length - 1} voted</p>
+              <div className="mb-5">
+                <WaitingCard
+                  title="Sit tight — you can't vote"
+                  subtitle={`${state.votes.length} of ${state.players.length - 1} have voted`}
+                />
               </div>
             ) : iVoted ? (
-              <div className="bg-ink/60 rounded-2xl p-6 text-center mb-4">
-                <p className="text-cream/70">Vote cast ✓</p>
-                <p className="text-cream/50 text-sm mt-2">Waiting for others…</p>
+              <div className="mb-5">
+                <WaitingCard title="Vote cast" subtitle="Waiting for the others…" done />
               </div>
             ) : (
-              <>
-                <p className="text-cream/80 mb-3">Which card do you think is the storyteller's?</p>
+              <div className="mb-5 rounded-2xl border border-line bg-card p-5 shadow-frame">
+                <p className="text-ink/80">
+                  Which card do you think is the{' '}
+                  <em className="font-display not-italic font-semibold">storyteller's</em>?
+                </p>
                 <button
                   onClick={() => apiCall('/api/game/vote', { code, playerId, cardId: selectedCard })}
                   disabled={selectedCard === null || busy}
-                  className="w-full py-3 rounded-xl bg-gold text-ink font-bold disabled:opacity-50 mb-4"
+                  className="mt-3 w-full rounded-xl bg-coral py-3 font-semibold text-paper transition-colors hover:bg-coralink disabled:opacity-40"
                 >
-                  Vote
+                  {selectedCard === null ? 'Select a card below' : 'Cast your vote'}
                 </button>
-              </>
+              </div>
             )}
-            <div className="flex flex-wrap gap-4 md:gap-3 justify-center">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-3">
               {state.shuffledCards.map((cardId) => {
                 const myOwnCard = state.submissions.find(
                   (s) => s.playerId === playerId
@@ -327,7 +359,7 @@ export default function RoomPage() {
             votedIds={votedIds}
           />
         </div>
-        {error && <p className="text-red-300 text-center mt-4">{error}</p>}
+        {error && <ErrorNote>{error}</ErrorNote>}
       </main>
     );
   }
@@ -336,23 +368,25 @@ export default function RoomPage() {
   if (state.phase === 'reveal' || state.phase === 'ended') {
     const result = state.lastResult;
     return (
-      <main className="min-h-screen p-3 md:p-6 max-w-6xl mx-auto">
+      <main className="mx-auto max-w-6xl p-4 md:p-8">
         <Header code={code} phase={state.phase} round={state.round} maxRounds={state.maxRounds} />
         {state.phase === 'ended' ? (
           <EndScreen state={state} />
         ) : (
           <>
-            <div className="bg-plum/20 border-2 border-plum/50 rounded-xl p-5 mt-6 text-center">
-              <p className="text-cream/60 text-xs uppercase tracking-wider mb-1">Clue was</p>
-              <p className="text-3xl text-gold font-serif italic">"{state.clue}"</p>
-              <p className="text-cream/60 text-sm mt-2">— {storyteller.name}</p>
+            <ClueBanner clue={state.clue} author={storyteller.name} pastTense />
+            <h2 className="mt-8 text-center font-display text-3xl font-medium text-ink">
+              The reveal
+            </h2>
+            <div className="m-2 mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-sm text-muted">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-sage" /> storyteller's card
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-coral" /> decoy that drew votes
+              </span>
             </div>
-            <h2 className="text-2xl text-gold font-serif text-center mt-6 mb-2">Reveal</h2>
-            <p className="text-center text-cream/60 text-sm mb-4">
-              <span className="text-green-400 font-bold">Green</span> = storyteller's card ·{' '}
-              <span className="text-red-400 font-bold">Red</span> = decoy that got votes
-            </p>
-            <div className="flex flex-wrap gap-6 md:gap-4 justify-center">
+            <div className="mt-6 flex flex-wrap justify-center gap-6 md:gap-4">
               {state.shuffledCards.map((cardId) => {
                 const isStoryCard = cardId === revealedStorytellerCard;
                 const owner =
@@ -367,7 +401,10 @@ export default function RoomPage() {
                 const outcome: 'correct' | 'decoy' | undefined =
                   isStoryCard ? 'correct' : voteCount > 0 ? 'decoy' : undefined;
                 return (
-                  <div key={cardId} className="flex flex-col items-center gap-2 w-64 sm:w-44 md:w-40">
+                  <div
+                    key={cardId}
+                    className="flex w-64 flex-col items-center gap-2 animate-scale-in sm:w-44 md:w-40"
+                  >
                     <Card
                       cardId={cardId}
                       outcome={outcome}
@@ -375,21 +412,17 @@ export default function RoomPage() {
                       label={isStoryCard ? `🎭 ${ownerName}` : ownerName}
                     />
                     {isStoryCard && (
-                      <div className="text-green-400 font-bold text-xs uppercase tracking-wider">
-                        ✅ Storyteller's card
-                      </div>
+                      <div className="eyebrow text-sage">✦ Storyteller's card</div>
                     )}
                     {!isStoryCard && voteCount > 0 && (
-                      <div className="text-red-400 font-bold text-xs uppercase tracking-wider">
-                        ❌ Decoy
-                      </div>
+                      <div className="eyebrow text-coral">Decoy</div>
                     )}
-                    <div className="text-cream/80 text-sm">
+                    <div className="text-sm font-medium text-ink/70">
                       {voteCount} vote{voteCount === 1 ? '' : 's'}
                     </div>
                     {voters.length > 0 && (
-                      <div className="text-cream/50 text-xs text-center leading-tight">
-                        voted by: {voters.join(', ')}
+                      <div className="text-center text-xs leading-tight text-muted">
+                        {voters.join(', ')}
                       </div>
                     )}
                   </div>
@@ -397,15 +430,19 @@ export default function RoomPage() {
               })}
             </div>
             {result && (
-              <div className="bg-ink/60 rounded-xl p-5 mt-6 max-w-lg mx-auto">
-                <h3 className="text-gold font-bold mb-3 text-center">Score this round</h3>
-                <ul className="space-y-1">
+              <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-line bg-card p-6 shadow-frame">
+                <h3 className="eyebrow mb-4 text-center text-muted">Points this round</h3>
+                <ul className="divide-y divide-line">
                   {state.players.map((p) => {
                     const delta = result.scoreDelta[p.id] || 0;
                     return (
-                      <li key={p.id} className="flex justify-between text-cream">
-                        <span>{p.name}</span>
-                        <span className={delta > 0 ? 'text-green-400' : 'text-cream/50'}>
+                      <li key={p.id} className="flex items-center justify-between py-2 text-ink">
+                        <span className="text-ink/80">{p.name}</span>
+                        <span
+                          className={`font-display text-lg font-semibold tabular-nums ${
+                            delta > 0 ? 'text-sage' : 'text-muted/50'
+                          }`}
+                        >
                           {delta > 0 ? `+${delta}` : '—'}
                         </span>
                       </li>
@@ -414,21 +451,22 @@ export default function RoomPage() {
                 </ul>
               </div>
             )}
-            {me.isHost && (
-              <div className="text-center mt-6">
+            {me.isHost ? (
+              <div className="mt-8 text-center">
                 <button
                   onClick={() => apiCall('/api/game/next', { code, playerId })}
                   disabled={busy}
-                  className="px-8 py-3 rounded-xl bg-gold text-ink font-bold hover:bg-gold/90 disabled:opacity-50"
+                  className="rounded-xl bg-ink px-10 py-3.5 font-semibold text-paper transition-colors hover:bg-ink/90 disabled:opacity-50"
                 >
                   Next round →
                 </button>
               </div>
+            ) : (
+              <p className="mt-8 text-center font-display italic text-muted">Waiting for the host…</p>
             )}
-            {!me.isHost && <p className="text-center text-cream/60 italic mt-6">Waiting for host…</p>}
           </>
         )}
-        {error && <p className="text-red-300 text-center mt-4">{error}</p>}
+        {error && <ErrorNote>{error}</ErrorNote>}
       </main>
     );
   }
@@ -438,14 +476,70 @@ export default function RoomPage() {
 
 function Header({ code, phase, round, maxRounds }: { code: string; phase: Phase; round: number; maxRounds: number }) {
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-3xl font-serif text-gold">Dixit</h1>
-        <p className="text-cream/50 text-xs uppercase tracking-wider mt-1">
-          Room {code} · {phase === 'lobby' ? 'Lobby' : `Round ${round}/${maxRounds}`}
-        </p>
+    <header className="flex items-center justify-between border-b border-line pb-4">
+      <a href="/" className="font-display text-2xl font-semibold tracking-tight text-ink">
+        Dixit
+      </a>
+      <div className="flex items-center gap-2.5 text-sm text-muted">
+        <span className="font-medium">Room {code}</span>
+        <span className="h-1 w-1 rounded-full bg-line" />
+        <span>{phase === 'lobby' ? 'Lobby' : `Round ${round} of ${maxRounds}`}</span>
       </div>
+    </header>
+  );
+}
+
+function ClueBanner({
+  clue, author, pastTense,
+}: { clue: string | null; author: string; pastTense?: boolean }) {
+  return (
+    <div className="mt-6 rounded-2xl border border-line bg-card px-6 py-6 text-center shadow-frame animate-fade-up">
+      <p className="eyebrow mb-2 text-coral">{pastTense ? 'The clue was' : 'The clue'}</p>
+      <p className="font-display text-3xl italic text-ink md:text-4xl">
+        <span className="text-coral/40">“</span>
+        {clue}
+        <span className="text-coral/40">”</span>
+      </p>
+      <p className="mt-2 text-sm text-muted">— {author}</p>
     </div>
+  );
+}
+
+function WaitingCard({
+  title, subtitle, emoji, done,
+}: { title: string; subtitle: string; emoji?: string; done?: boolean }) {
+  return (
+    <div className="rounded-2xl border border-line bg-card p-10 text-center shadow-frame animate-fade-up">
+      {emoji && <div className="mb-3 text-4xl">{emoji}</div>}
+      {done && (
+        <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-sage/15 text-sage">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10.5l4 4 8-9" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      )}
+      <p className="font-display text-2xl font-medium text-ink">{title}</p>
+      <p className="mt-1.5 text-muted">{subtitle}</p>
+      {!done && (
+        <div className="mt-5 flex justify-center gap-1.5">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="h-2 w-2 rounded-full bg-coral animate-pulse-soft"
+              style={{ animationDelay: `${i * 0.2}s` }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ErrorNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mx-auto mt-6 max-w-md rounded-xl bg-coral/10 px-4 py-2.5 text-center text-sm font-medium text-coralink">
+      {children}
+    </p>
   );
 }
 
@@ -454,7 +548,7 @@ function Hand({
 }: { hand: number[]; selectedCard: number | null; onSelect: (id: number) => void }) {
   return (
     <div>
-      <p className="text-cream/60 text-xs uppercase tracking-wider mb-2">Your hand</p>
+      <p className="eyebrow mb-3 text-muted">Your hand</p>
       <div className="flex flex-wrap gap-3">
         {hand.map((cardId) => (
           <Card
@@ -474,18 +568,33 @@ function EndScreen({ state }: { state: PublicState }) {
   const ranked = [...state.players].sort((a, b) => b.score - a.score);
   const winner = ranked[0];
   return (
-    <div className="bg-ink/60 backdrop-blur rounded-2xl p-8 mt-6 text-center">
-      <h2 className="text-4xl text-gold font-serif mb-2">Game Over</h2>
-      <p className="text-cream/70 mb-6">🏆 {winner.name} wins with {winner.score} points!</p>
-      <ol className="max-w-sm mx-auto space-y-2 mb-8">
+    <div className="mx-auto mt-8 max-w-lg animate-fade-up text-center">
+      <p className="eyebrow mb-3 text-coral">Game over</p>
+      <div className="mb-6 text-5xl">🏆</div>
+      <h2 className="font-display text-4xl font-medium text-ink">{winner.name} wins</h2>
+      <p className="mt-2 text-muted">with {winner.score} points</p>
+
+      <ol className="mx-auto mb-8 mt-8 space-y-2 text-left">
         {ranked.map((p, i) => (
-          <li key={p.id} className="flex justify-between text-cream bg-ink/50 rounded px-4 py-2">
-            <span>{i + 1}. {p.name}</span>
-            <span className="font-bold">{p.score}</span>
+          <li
+            key={p.id}
+            className={`flex items-center justify-between rounded-xl border px-4 py-3 ${
+              i === 0 ? 'border-gold/40 bg-gold/10' : 'border-line bg-card'
+            }`}
+          >
+            <span className="flex items-center gap-3">
+              <span className="font-display text-lg font-semibold text-muted">{i + 1}</span>
+              <span className="text-ink">{p.name}</span>
+            </span>
+            <span className="font-display text-lg font-semibold tabular-nums text-ink">{p.score}</span>
           </li>
         ))}
       </ol>
-      <a href="/" className="inline-block px-8 py-3 rounded-xl bg-gold text-ink font-bold hover:bg-gold/90">
+
+      <a
+        href="/"
+        className="inline-block rounded-xl bg-ink px-10 py-3.5 font-semibold text-paper transition-colors hover:bg-ink/90"
+      >
         New game
       </a>
     </div>

@@ -2,42 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --paper: #f4f1ea;
+  --ink: #1c1a1e;
+  --coral: #e0533d;
+}
+
 html, body {
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse at top, #3d2a5e 0%, #1a0f2e 60%, #0a0617 100%);
-  color: #f5efe0;
-  font-family: Georgia, 'Times New Roman', serif;
+  background-color: var(--paper);
+  /* Soft warm light from the top, plus a whisper of coral in the corners. */
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, rgba(255, 255, 255, 0.9) 0%, rgba(244, 241, 234, 0) 55%),
+    radial-gradient(60% 60% at 100% 0%, rgba(224, 83, 61, 0.06) 0%, rgba(244, 241, 234, 0) 60%),
+    radial-gradient(70% 70% at 0% 100%, rgba(63, 122, 109, 0.05) 0%, rgba(244, 241, 234, 0) 60%);
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
+
+/* Fine paper grain overlay for tactile depth. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+body > * { position: relative; z-index: 1; }
 
 * { box-sizing: border-box; }
 
+::selection { background: rgba(224, 83, 61, 0.18); }
+
 button:not(:disabled):active { transform: translateY(1px); }
 
-.card-shadow {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
+/* Focus rings — coral, subtle. */
+input:focus-visible,
+button:focus-visible {
+  outline: none;
 }
 
-.glow-gold {
-  box-shadow: 0 0 0 3px #c9a455, 0 0 24px rgba(201,164,85,0.5);
+/* ---- Card presentation: framed artworks ---- */
+.card-frame {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--card, #fbfaf6);
+}
+.card-frame:not(.is-disabled):hover {
+  transform: translateY(-8px) rotate(-0.4deg);
+}
+.card-frame.is-selected {
+  transform: translateY(-10px);
+}
+.card-frame.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
 }
 
-.glow-plum {
-  box-shadow: 0 0 0 3px #b08fd1, 0 0 16px rgba(176,143,209,0.4);
+/* Selection + outcome rings drawn as layered box-shadows so they compose with the frame shadow. */
+.ring-select {
+  box-shadow: 0 0 0 2px #fbfaf6, 0 0 0 5px var(--coral),
+    0 2px 4px rgba(28, 26, 30, 0.08), 0 24px 48px -16px rgba(28, 26, 30, 0.4);
+}
+.ring-correct {
+  box-shadow: 0 0 0 2px #fbfaf6, 0 0 0 5px #3f7a6d,
+    0 0 0 10px rgba(63, 122, 109, 0.16), 0 18px 40px -12px rgba(63, 122, 109, 0.5);
+}
+.ring-decoy {
+  box-shadow: 0 0 0 2px #fbfaf6, 0 0 0 5px #e0533d,
+    0 0 0 10px rgba(224, 83, 61, 0.16), 0 18px 40px -12px rgba(224, 83, 61, 0.45);
+}
+.ring-story {
+  box-shadow: 0 0 0 2px #fbfaf6, 0 0 0 5px #b98a2e,
+    0 0 0 10px rgba(185, 138, 46, 0.16), 0 18px 40px -12px rgba(185, 138, 46, 0.45);
 }
 
-.glow-green {
-  box-shadow: 0 0 0 5px #22c55e, 0 0 32px rgba(34,197,94,0.7);
+/* Small caps label treatment used throughout. */
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  font-size: 0.68rem;
 }
 
-.glow-red {
-  box-shadow: 0 0 0 5px #ef4444, 0 0 28px rgba(239,68,68,0.6);
+/* Ticket-style room code with perforated edges. */
+.ticket {
+  background:
+    radial-gradient(circle at 0 50%, transparent 8px, var(--card, #fbfaf6) 8px) left,
+    radial-gradient(circle at 100% 50%, transparent 8px, var(--card, #fbfaf6) 8px) right;
+  background-size: 51% 100%;
+  background-repeat: no-repeat;
 }
-
-/* Card flip + hover */
-.card-tile {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.card-tile:hover:not(.disabled) { transform: translateY(-6px); }
-.card-tile.disabled { opacity: 0.5; cursor: not-allowed; }
