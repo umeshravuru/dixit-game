@@ -65,6 +65,13 @@ button:focus-visible {
   cursor: not-allowed;
   filter: grayscale(0.3);
 }
+/* Display-only cards: no hover-lift, default cursor. */
+.card-frame.is-static {
+  cursor: default;
+}
+.card-frame.is-static:hover {
+  transform: none;
+}
 
 /* Selection + outcome rings drawn as layered box-shadows so they compose with the frame shadow. */
 .ring-select {

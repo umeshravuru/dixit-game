@@ -231,11 +231,19 @@ export default function RoomPage() {
                 <Hand hand={hand} selectedCard={selectedCard} onSelect={setSelectedCard} />
               </>
             ) : (
-              <WaitingCard
-                title={storyteller.name}
-                subtitle="is dreaming up a clue…"
-                emoji="🎭"
-              />
+              <>
+                <WaitingCard
+                  title={storyteller.name}
+                  subtitle="is dreaming up a clue…"
+                  emoji="🎭"
+                />
+                <Hand
+                  hand={hand}
+                  readOnly
+                  label="Your hand"
+                  hint="Take a look — you'll pick a match once the clue arrives"
+                />
+              </>
             )}
           </div>
           <PlayerList players={state.players} storytellerId={storyteller.id} meId={playerId} />
@@ -544,18 +552,28 @@ function ErrorNote({ children }: { children: React.ReactNode }) {
 }
 
 function Hand({
-  hand, selectedCard, onSelect,
-}: { hand: number[]; selectedCard: number | null; onSelect: (id: number) => void }) {
+  hand, selectedCard, onSelect, readOnly, label, hint,
+}: {
+  hand: number[];
+  selectedCard?: number | null;
+  onSelect?: (id: number) => void;
+  readOnly?: boolean;
+  label?: string;
+  hint?: string;
+}) {
   return (
     <div>
-      <p className="eyebrow mb-3 text-muted">Your hand</p>
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <p className="eyebrow text-muted">{label ?? 'Your hand'}</p>
+        {hint && <p className="text-xs italic text-muted">{hint}</p>}
+      </div>
       <div className="flex flex-wrap gap-3">
         {hand.map((cardId) => (
           <Card
             key={cardId}
             cardId={cardId}
-            selected={selectedCard === cardId}
-            onClick={() => onSelect(cardId)}
+            selected={!readOnly && selectedCard === cardId}
+            onClick={readOnly ? undefined : () => onSelect?.(cardId)}
             size="md"
           />
         ))}

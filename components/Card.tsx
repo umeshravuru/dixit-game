@@ -8,12 +8,13 @@ interface Props {
   highlighted?: boolean; // gold ring (e.g. storyteller's card on reveal)
   outcome?: 'correct' | 'decoy'; // reveal-phase emphasis: sage = storyteller's, coral = decoy
   disabled?: boolean;
+  readOnly?: boolean; // display-only: no hover-lift, no pointer, not focusable
   onClick?: () => void;
   label?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function Card({ cardId, selected, highlighted, outcome, disabled, onClick, label, size = 'md' }: Props) {
+export function Card({ cardId, selected, highlighted, outcome, disabled, readOnly, onClick, label, size = 'md' }: Props) {
   const card = CARDS[cardId];
   // Responsive sizes — bigger on mobile (where cards stack), smaller on desktop (where they fan out).
   const sizes = {
@@ -29,14 +30,12 @@ export function Card({ cardId, selected, highlighted, outcome, disabled, onClick
     : highlighted ? 'ring-story'
     : 'shadow-frame';
 
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`card-frame group relative rounded-lg p-2 pb-3 ${sizes[size]} ${ring} ${
-        disabled ? 'is-disabled' : ''
-      } ${selected ? 'is-selected' : ''}`}
-    >
+  const className = `card-frame group relative rounded-lg p-2 pb-3 ${sizes[size]} ${ring} ${
+    disabled ? 'is-disabled' : ''
+  } ${readOnly ? 'is-static' : ''} ${selected ? 'is-selected' : ''}`;
+
+  const inner = (
+    <>
       {/* Inner mat + artwork */}
       <div className="relative h-full w-full overflow-hidden rounded-sm bg-ink/5 shadow-inset">
         {card ? (
@@ -62,6 +61,16 @@ export function Card({ cardId, selected, highlighted, outcome, disabled, onClick
           </div>
         )}
       </div>
+    </>
+  );
+
+  if (readOnly) {
+    return <div className={className}>{inner}</div>;
+  }
+
+  return (
+    <button onClick={onClick} disabled={disabled} className={className}>
+      {inner}
     </button>
   );
 }
